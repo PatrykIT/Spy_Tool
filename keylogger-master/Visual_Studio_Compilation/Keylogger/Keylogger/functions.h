@@ -7,11 +7,9 @@
 #include <windows.h>
 #include <stdlib.h>
 
-using namespace std;
-
-string intToString(int);
-string getCurrDir();
-string getSelfPath();
-string dirBasename(string);
+std::string intToString(int);
+std::string getCurrDir();
+std::string getSelfPath();
+std::string dirBasename(std::string);
 
 #endif /* _FUNCTIONS_H */

