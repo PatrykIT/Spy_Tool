@@ -1,9 +1,12 @@
 #include "stdafx.h"
-#include "main.h"
 
 #include <string>
 #include <windows.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <iostream>
+#include <fstream>
 
 std::string intToString(int);
 std::string getSelfPath();
