@@ -15,8 +15,8 @@ private:
 public:
 	
 
-	bool update_window(const std::string &last_title, const std::string &current_title, std::ofstream &file_logs);
-	std::string get_window_name();
+	//bool update_window(const std::string &last_title, const std::string &current_title, std::ofstream &file_logs);
+	//std::string get_window_name();
 	void get_key(std::ofstream &file_logs);
-	std::ofstream create_file();
+	std::string create_file();
 };
