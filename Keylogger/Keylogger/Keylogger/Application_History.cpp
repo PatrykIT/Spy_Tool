@@ -7,14 +7,29 @@
 
 #define DEBUG
 
-Application_History::Application_History(std::ofstream &_applications_log_with_keys, const std::string &file_path) : 
-	applications_log_with_keys(_applications_log_with_keys)
+Application_History::Application_History(std::ofstream &_applications_log_with_keys, std::ofstream &_applications_log_with_clean_keys,
+	const std::string &file_path, bool save_enabled) :
+	applications_log_with_keys(_applications_log_with_keys),
+	applications_log_with_clean_keys(_applications_log_with_clean_keys)
 {
+	saving_enabled = save_enabled;
+	
+	// Append a string to the name before the extension
 	size_t position_to_prepend = file_path.find(".log");
 	std::string path_for_applications_only = file_path;
 	path_for_applications_only.insert(position_to_prepend, "_applications_only");
 	applications_log.open(path_for_applications_only);
 }
+
+void Application_History::save_to_file(std::ofstream &file_stream, const std::string &content)
+{
+	if (saving_enabled)
+	{
+		file_stream << content;
+		file_stream.flush();
+	}
+}
+
 
 std::string Application_History::get_window_name()
 {
@@ -45,31 +60,42 @@ void Application_History::update_window()
 	std::string PL_no_active_window = "NIE MA AKTYWNEJ APLIKACJI";
 	if (last_title != current_title)
 	{
-		applications_log << std::endl << std::endl << PL_window;
-		applications_log_with_keys << std::endl << std::endl << PL_window;
+		std::string content;
+		
+		content = "\n\n" + PL_window;
+		save_to_file(applications_log, content);
+		save_to_file(applications_log_with_keys, content);
+		save_to_file(applications_log_with_clean_keys, content);
+
 #ifdef DEBUG
-		std::cout << std::endl << std::endl << PL_window;
+		std::cout << content;
 #endif
 		if (current_title.empty())
 		{
-			applications_log << PL_no_active_window;
-			applications_log_with_keys << PL_no_active_window;
+			content = PL_no_active_window;
+			save_to_file(applications_log, content);
+			save_to_file(applications_log_with_keys, content);
+			save_to_file(applications_log_with_clean_keys, content);
 #ifdef DEBUG
-			std::cout << PL_no_active_window;
+			std::cout << content;
 #endif
 		}
 		else
 		{
-			applications_log << "'" << current_title << "'";
-			applications_log_with_keys << "'" << current_title << "'";
+			content = "'" + current_title + "'";
+			save_to_file(applications_log, content);
+			save_to_file(applications_log_with_keys, content);
+			save_to_file(applications_log_with_clean_keys, content);
 #ifdef DEBUG
-			std::cout << "'" << current_title << "'";
+			std::cout << content;
 #endif
 		}
-		applications_log << std::endl;
-		applications_log_with_keys << std::endl;
+		content = "\n";
+		save_to_file(applications_log, content);
+		save_to_file(applications_log_with_keys, content);
+		save_to_file(applications_log_with_clean_keys, content);
 #ifdef DEBUG
-		std::cout << std::endl;
+		std::cout << content;
 #endif
 
 		last_title = current_title;
