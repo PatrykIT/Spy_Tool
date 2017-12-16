@@ -18,7 +18,6 @@ enum class image_type
 
 Screenshot::Screenshot()
 {
-	convert_string_to_wchar();
 }
 
 void Screenshot::convert_string_to_wchar()
@@ -33,21 +32,13 @@ void Screenshot::compress_image()
 	_com_error error_text = result;
 
 	ATL::CImage img;
-
-	//https://msdn.microsoft.com/en-us/library/windows/desktop/ms534077(v=vs.85).aspx
-	//Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	//ULONG_PTR gdiplusToken;
-	//GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-	//Gdiplus::Image *image = new Gdiplus::Image(filename);
-	//printf("The height of the image is %u.\n", image->GetHeight());
-
 	result = img.Load(file_buffer);
 
 	LPCTSTR error_message = error_text.ErrorMessage();
-	wprintf(L"Result [load]: %s\n", error_message);
+	//wprintf(L"Result [load]: %s\n", error_message);
 
 	result = img.Save(file_buffer, Gdiplus::ImageFormatJPEG);
-	wprintf(L"Result [save]: %s\n", error_message);
+	//wprintf(L"Result [save]: %s\n", error_message);
 }
 
 void Screenshot::save_image(HBITMAP bitmap, HDC hDC)
@@ -64,17 +55,15 @@ void Screenshot::save_image(HBITMAP bitmap, HDC hDC)
 	BYTE *hp; // byte pointer 
 	DWORD dwTmp;
 
-	// create the bitmapinfo header information
-
-	// A file will be named as a date
+	// A file name will be a date
 	time_t current_time;
-	char time_buffer[9];  // space for "HH:MM:SS\0"
+	char time_buffer[64];  // space for "HH:MM:SS\0"
 	
 	struct tm time_info;
 	time(&current_time);
 	localtime_s(&time_info ,&current_time);
 
-	strftime(time_buffer, sizeof(time_buffer), "%H_%M_%S", &time_info);
+	strftime(time_buffer, sizeof(time_buffer), "%d-%m-%G__%H_%M_%S", &time_info);
 	file_name = time_buffer;
 	file_name.append(".bmp");
 	convert_string_to_wchar();
