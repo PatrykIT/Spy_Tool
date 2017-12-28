@@ -191,7 +191,7 @@ void Screenshot::save_screenshot_as_image(HBITMAP bitmap, HDC hDC, std::string o
 		return;
 	}
 
-	printf("Image saved.\n");
+	printf("Zdjecie zapisane.\n");
 
 	// Free memory. 
 	GlobalFree((HGLOBAL)lpBits);
@@ -234,6 +234,7 @@ void Screenshot::take_screenshot(std::string optional_file_name = "")
 
 void Screenshot::auto_start()
 {
+	std::cout << "Screeny sa robione co: " << screenshot_timer << " sekund.\n";
 	while (1)
 	{
 		take_screenshot();

