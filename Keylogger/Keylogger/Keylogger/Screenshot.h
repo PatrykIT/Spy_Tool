@@ -7,12 +7,14 @@ class Screenshot
 private:
 	std::string file_name;
 	wchar_t file_buffer[64];
-	
-	void save_image(HBITMAP bitmap, HDC hDC);
+	int screenshot_timer = 30;
+
+	void save_screenshot_as_image(HBITMAP bitmap, HDC hDC, std::string optional_file_name);
 	void convert_string_to_wchar();
 
 public:
 	Screenshot();
-	void GetScreenShot();
+	void take_screenshot(std::string optional_file_name);
 	void compress_image();
+	void auto_start();
 };

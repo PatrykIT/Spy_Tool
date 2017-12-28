@@ -3,13 +3,15 @@
 
 #include "stdafx.h"
 #include "Screenshot.h"
+
 #include <iostream>
-//#include <Windows.h>
 #include <atlimage.h>
 #include <comdef.h>
-#include <Gdiplus.h>
 #include <time.h>
+#include <chrono>
+#include <thread>
 
+// Not used for now. It is destined for compress_image() function, so that user can choose what extension they want.
 enum class image_type
 {
 	JPEG,
@@ -41,7 +43,7 @@ void Screenshot::compress_image()
 	//wprintf(L"Result [save]: %s\n", error_message);
 }
 
-void Screenshot::save_image(HBITMAP bitmap, HDC hDC)
+void Screenshot::save_screenshot_as_image(HBITMAP bitmap, HDC hDC, std::string optional_file_name = "")
 {
 	BITMAP bmp;
 	PBITMAPINFO pbmi;
@@ -55,9 +57,9 @@ void Screenshot::save_image(HBITMAP bitmap, HDC hDC)
 	BYTE *hp; // byte pointer 
 	DWORD dwTmp;
 
-	// A file name will be a date
+	// A file name will be a full date.
 	time_t current_time;
-	char time_buffer[64];  // space for "HH:MM:SS\0"
+	char time_buffer[64];
 	
 	struct tm time_info;
 	time(&current_time);
@@ -65,6 +67,7 @@ void Screenshot::save_image(HBITMAP bitmap, HDC hDC)
 
 	strftime(time_buffer, sizeof(time_buffer), "%d-%m-%G__%H_%M_%S", &time_info);
 	file_name = time_buffer;
+	file_name.append(optional_file_name);
 	file_name.append(".bmp");
 	convert_string_to_wchar();
 
@@ -188,11 +191,14 @@ void Screenshot::save_image(HBITMAP bitmap, HDC hDC)
 		return;
 	}
 
+	printf("Image saved.\n");
+
 	// Free memory. 
 	GlobalFree((HGLOBAL)lpBits);
 }
 
-void Screenshot::GetScreenShot()
+/* Takes a screenshot as a bitmap and saves it to the disk */
+void Screenshot::take_screenshot(std::string optional_file_name = "")
 {
 	int x1, y1, x2, y2, width, height;
 
@@ -216,13 +222,23 @@ void Screenshot::GetScreenShot()
 	EmptyClipboard();
 	SetClipboardData(CF_BITMAP, hBitmap);
 	CloseClipboard();
-	std::cout << "Screenshot taken!\n";
 
-	save_image(hBitmap, hDC);
+	save_screenshot_as_image(hBitmap, hDC, optional_file_name);
 
 	// clean up
 	SelectObject(hDC, old_obj);
 	DeleteDC(hDC);
 	ReleaseDC(NULL, hScreen);
 	DeleteObject(hBitmap);
+}
+
+void Screenshot::auto_start()
+{
+	while (1)
+	{
+		take_screenshot();
+		compress_image();
+		std::chrono::seconds sleep_duration(screenshot_timer);
+		std::this_thread::sleep_for(sleep_duration);
+	}
 }
