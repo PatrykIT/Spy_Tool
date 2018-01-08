@@ -7,8 +7,8 @@
 
 #define DEBUG
 
-Application_History::Application_History(std::ofstream &_applications_log_with_keys, std::ofstream &_applications_log_with_clean_keys,
-	const std::string &file_path, bool save_enabled) :
+Application_History::Application_History(std::ofstream &_applications_log_with_keys,
+	std::ofstream &_applications_log_with_clean_keys, const std::string &file_path, bool save_enabled) :
 	applications_log_with_keys(_applications_log_with_keys),
 	applications_log_with_clean_keys(_applications_log_with_clean_keys)
 {

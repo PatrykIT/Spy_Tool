@@ -23,6 +23,7 @@ private:
 	std::string all_keys;
 
 	std::string m_file_path;
+	std::string m_file_path_clean_keys;
 	std::ofstream file_logs_clean_keys;
 	
 	std::vector<std::string> keywords = { };
@@ -36,4 +37,5 @@ public:
 	void get_key(std::ofstream &file_logs); //TODO: It should return the key for File manager class, and not save it.
 	std::string create_file(); //TODO: File manager class should handle it
 	std::ofstream& get_file_logs_clean_keys();
+	std::string get_path_to_clean_keys() { return m_file_path_clean_keys; }
 };

