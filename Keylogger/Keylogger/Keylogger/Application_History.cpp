@@ -67,17 +67,6 @@ void Application_History::update_window()
 			std::cout << content;
 #endif
 		}
-		else
-		{
-//			content = PL_no_active_window;
-//			save_to_file(applications_log, content);
-//			save_to_file(applications_log_with_keys, content);
-//			save_to_file(applications_log_with_clean_keys, content);
-//#ifdef DEBUG
-//			std::cout << content;
-//#endif
-		}
-
 
 		last_title = current_title;
 	}

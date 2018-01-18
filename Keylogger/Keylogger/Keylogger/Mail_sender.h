@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Credentials\Credentials.h" // This file is not included in Github etc!
+// This file is not included in Github etc. You need to make it yourself with your own credentials.
+#include "Credentials\Credentials.h" 
 
 #include <string>
 

@@ -15,7 +15,6 @@ class Keylogger
 private:
 	std::string intToString(int);
 	//TODO: There should be a FILE_manager class that does the file related stuff. Keylogger shouldn't know about it (Single Responsibility Principle)
-	std::string getSelfPath();
 	std::string dirBasename(std::string);
 
 	void save_to_file(std::ofstream &file_stream, const std::string &content);
