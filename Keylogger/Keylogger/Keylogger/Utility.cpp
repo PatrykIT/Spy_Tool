@@ -2,6 +2,8 @@
 
 #include "Utility.h"
 #include <fstream>
+#include <vector>
+#include <string>
 
 void utility::hide_window()
 {
@@ -38,6 +40,26 @@ bool utility::file_exists(const std::string &file_name)
 
 configuration::configuration_file_content configuration::fill_configuration_struct()
 {
+	// Keywords are written in the file with space as a delimiter. This lambda parses them to single strings
+	auto parse_strings = [](std::string keywords) -> std::vector<std::string>
+	{
+		std::string delimiter = " ";
+		std::vector<std::string> keywords_vec;
+
+		size_t pos = 0;
+		std::string token;
+
+		while ((pos = keywords.find(delimiter)) != std::string::npos)
+		{
+			token = keywords.substr(0, pos);
+			keywords_vec.emplace_back(std::move(token));
+			keywords.erase(0, pos + delimiter.length());
+		}
+
+		keywords_vec.emplace_back(std::move(keywords));
+		return keywords_vec;
+	};
+	
 	// Load data from configuration file
 	std::ifstream configuration_file(configuration_file_name);
 	configuration_file_content configuration;
@@ -45,15 +67,20 @@ configuration::configuration_file_content configuration::fill_configuration_stru
 
 	if (configuration_file.is_open())
 	{
+		// First line in a file is e-mail
 		std::getline(configuration_file, line);
 		configuration.mail_to = line;
-
 		line.clear();
+
+		// Second line in a file is time that emails should be resent
 		std::getline(configuration_file, line);
 		configuration.mail_send_loop = std::stoi(line);
+		line.clear();
 
+		// Third line are keywords
+		std::getline(configuration_file, line);
+		configuration.keywords = parse_strings(line);
 
-		// TODO: Load up keywords here.
 	}
 	else
 	{

