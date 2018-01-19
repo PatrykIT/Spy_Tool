@@ -38,7 +38,7 @@ bool utility::file_exists(const std::string &file_name)
 	return file.good();
 }
 
-configuration::configuration_file_content configuration::fill_configuration_struct()
+configuration::configuration_file_content configuration::load_configuration_from_file()
 {
 	// Keywords are written in the file with space as a delimiter. This lambda parses them to single strings
 	auto parse_strings = [](std::string keywords) -> std::vector<std::string>
@@ -80,10 +80,31 @@ configuration::configuration_file_content configuration::fill_configuration_stru
 		// Third line are keywords
 		std::getline(configuration_file, line);
 		configuration.keywords = parse_strings(line);
-
+		printf("Size: %d", configuration.keywords.size());
 	}
 	else
 	{
 		// Handle it somehow, but don't let the user know.
+	}
+
+	return configuration;
+}
+
+void configuration::save_configuration_to_file(std::string mail_to, int email_send_loop_time, std::vector<std::string> keywords)
+{
+	std::ofstream configuration_file(configuration_file_name);
+	configuration_file << mail_to << "\n";
+	configuration_file << email_send_loop_time << "\n";
+
+	for (const std::string &keyword : keywords)
+	{
+		configuration_file << keyword;
+		
+		// Don't write space after the last string
+		if (keyword == keywords.back())
+		{
+			break;
+		}
+		configuration_file << " ";
 	}
 }

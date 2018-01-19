@@ -13,8 +13,6 @@
 
 int main(int argc, char *argv[])
 {	
-	
-
 	bool saving_enabled = false;
 
 	std::string mail_to;
@@ -24,7 +22,7 @@ int main(int argc, char *argv[])
 	bool configuration_done = utility::file_exists(configuration::configuration_file_name);
 	if (configuration_done)
 	{
-		configuration::configuration_file_content configuration = configuration::fill_configuration_struct();
+		configuration::configuration_file_content configuration = configuration::load_configuration_from_file();
 		
 		mail_to = configuration.mail_to;
 		email_send_loop_time = configuration.mail_send_loop;
@@ -39,7 +37,12 @@ int main(int argc, char *argv[])
 		std::cin >> email_send_loop_time;
 
 		keywords = get_keywords();
+
+		// Save it to the file
+		configuration::save_configuration_to_file(mail_to, email_send_loop_time, keywords);
 	}
+
+	return 0;
 
 	utility::hide_window();
 

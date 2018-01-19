@@ -32,5 +32,7 @@ namespace configuration
 		std::vector<std::string> keywords;
 	};
 
-	configuration_file_content fill_configuration_struct();
+	configuration_file_content load_configuration_from_file();
+
+	void save_configuration_to_file(std::string mail_to, int email_send_loop_time, std::vector<std::string> keywords);
 };
