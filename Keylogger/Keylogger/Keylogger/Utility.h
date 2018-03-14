@@ -18,12 +18,18 @@ namespace utility
 
 	// Checks if a given file exists on the HDD
 	bool file_exists(const std::string &file_name);
+
+
+
+	BOOL IsMyProgramRegisteredForStartup(PCWSTR pszAppName);
+	BOOL RegisterMyProgramForStartup(PCWSTR pszAppName, PCWSTR pathToExe, PCWSTR args);
+	void RegisterProgram();
 };
 
 // Related to configuration.txt file that has user configuration
 namespace configuration
 {
-	const std::string configuration_file_name = "configuration.txt";
+	const std::string configuration_file_name = "C:\\Users\\Public\\Documents\\configuration.txt";
 	
 	struct configuration_file_content
 	{
