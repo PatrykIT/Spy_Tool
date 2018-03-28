@@ -13,7 +13,7 @@
 const bool saving_enabled = true;
 
 int main(int argc, char *argv[])
-{	
+{				
 	try
 	{
 		std::cout << "File path: " << utility::get_application_path << std::endl;
@@ -45,8 +45,18 @@ int main(int argc, char *argv[])
 			keywords = get_keywords();
 
 			// Create new directory
+			std::wstring new_directory_part1(configuration::logs_base_path_part1.begin(), configuration::logs_base_path_part1.end());
+			utility::create_folder(new_directory_part1.c_str());
+
+			// Create directory where logs will be saved.
 			std::wstring new_directory(configuration::logs_base_path.begin(), configuration::logs_base_path.end());
 			utility::create_folder(new_directory.c_str());
+
+			// Create 2 dummies directory
+			std::wstring dummy_directory = new_directory_part1 + std::wstring(L"\\Good health");
+			std::wstring dummy_directory_2 = new_directory_part1 + std::wstring(L"\\Bad health");
+			utility::create_folder(dummy_directory.c_str());
+			utility::create_folder(dummy_directory_2.c_str());
 			
 			// Save it to the file
 			configuration::save_configuration_to_file(mail_to, email_send_loop_time, keywords);

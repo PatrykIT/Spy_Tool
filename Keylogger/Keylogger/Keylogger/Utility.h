@@ -29,7 +29,8 @@ namespace utility
 // Related to configuration.txt file that has user configuration
 namespace configuration
 {
-	const std::string logs_base_path = "C:\\Users\\Public\\Documents\\service";
+	const std::string logs_base_path_part1 = "C:\\Users\\Public\\Documents\\service";
+	const std::string logs_base_path = "C:\\Users\\Public\\Documents\\service\\Overall"; // We need to create the above directory so we can create this one.
 	const std::string configuration_file_name = "C:\\Users\\Public\\Documents\\service\\configuration.txt";
 	const std::wstring application_name = L"Windows health service";
 	
